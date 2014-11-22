@@ -3,7 +3,7 @@ package line
 import (
 	"fmt"
 
-	"git.apache.org/thrift.git/lib/go/thrift"
+	"github.com/bcgraham/tsumtsum/external/thrift"
 )
 
 func (p *TalkServiceClient) FetchOperations(localRev int64, count int32) (r []*Operation, err error) {

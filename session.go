@@ -13,7 +13,7 @@ import (
 	"github.com/bcgraham/tsumtsum/external/line"
 	"github.com/bgentry/speakeasy"
 
-	"git.apache.org/thrift.git/lib/go/thrift"
+	"github.com/bcgraham/tsumtsum/external/thrift"
 )
 
 type Session struct {

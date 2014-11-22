@@ -3,7 +3,7 @@ package line
 import (
 	"fmt"
 
-	"git.apache.org/thrift.git/lib/go/thrift"
+	"github.com/bcgraham/tsumtsum/external/thrift"
 )
 
 func (p *TalkServiceClient) GetLastOpRevision() (r int64, err error) {

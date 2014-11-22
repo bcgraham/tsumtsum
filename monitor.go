@@ -6,7 +6,7 @@ import (
 
 	"github.com/bcgraham/tsumtsum/external/line"
 
-	"git.apache.org/thrift.git/lib/go/thrift"
+	"github.com/bcgraham/tsumtsum/external/thrift"
 )
 
 type MonitorCommand struct{}

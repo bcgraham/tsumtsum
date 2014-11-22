@@ -3,7 +3,7 @@ package line
 import (
 	"fmt"
 
-	"git.apache.org/thrift.git/lib/go/thrift"
+	"github.com/bcgraham/tsumtsum/external/thrift"
 )
 
 func (p *TalkServiceClient) FindAndAddContactsByMid(reqSeq int32, mid string) (r map[string]*Contact, err error) {

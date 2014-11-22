@@ -3,7 +3,7 @@ package line
 import (
 	"fmt"
 
-	"git.apache.org/thrift.git/lib/go/thrift"
+	"github.com/bcgraham/tsumtsum/external/thrift"
 )
 
 func (p *TalkServiceClient) LoginWithIdentityCredentialForCertificate(identityProvider IdentityProvider, identifier string, password string, keepLoggedIn bool, accessLocation string, systemName string, certificate string) (r *LoginResult_, err error) {
