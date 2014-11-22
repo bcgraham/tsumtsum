@@ -38,3 +38,6 @@ Icon
 logs/
 results/
 whitelist.txt
+*.exe
+server/*.exe
+server/*.db
