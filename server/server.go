@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -62,6 +63,8 @@ func get(stmt *sql.Stmt) httprouter.Handle {
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+	port := flag.String("port", ":8080", "port on which to run server")
+	flag.Parse()
 	db, err := sql.Open("sqlite3", "users.db")
 	if err != nil {
 		log.Fatalf("Could not open db: %v", err)
@@ -87,7 +90,7 @@ func main() {
 	router.POST("/tsum/:user/reports/searches", post(searches))
 	router.POST("/tsum/:user/reports/invites", post(invites))
 
-	err = http.ListenAndServe(":8080", router)
+	err = http.ListenAndServe(*port, router)
 	if err != nil {
 		fmt.Println(err)
 	}
