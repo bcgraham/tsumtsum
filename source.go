@@ -16,7 +16,7 @@ func (s *Session) SendReport(r Report) error {
 	enc := json.NewEncoder(&buf)
 	err := enc.Encode(r)
 	u := *s.reportingServer
-	u.Path = path.Join(s.username, "reports", string(r.Type))
+	u.Path = path.Join("tsum", s.username, "reports", string(r.Type))
 	resp, err := http.Post(u.String(), "application/json", &buf)
 	if err != nil {
 		return err

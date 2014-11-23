@@ -29,7 +29,19 @@ func post(res resource) httprouter.Handle {
 		if report.Submitter != ps[0].Value {
 			log.Printf("SearchReport and URL disagree about identity of submitter: SR says \"%v\", URL says \"%v\".\n", report.Submitter, ps[0].Value)
 		}
-		go res.stmt.Exec(res.args(report))
+		go func() {
+			result, err := res.stmt.Exec(res.args(report))
+			if err != nil {
+				log.Printf("error writing to db: %v\n", err)
+				return
+			}
+			affected, err := result.RowsAffected()
+			if err != nil {
+				log.Printf("error getting row count: %v\n", err)
+				return
+			}
+			log.Printf("affected %d rows\n", affected)
+		}()
 	}
 }
 
@@ -70,10 +82,10 @@ func main() {
 
 	router := httprouter.New()
 
-	router.GET("/:user/strangers/", get(strangers))
-	router.GET("/:user/reports", get(reports))
-	router.POST("/:user/reports/searches", post(searches))
-	router.POST("/:user/reports/invites", post(invites))
+	router.GET("/tsum/:user/strangers/", get(strangers))
+	router.GET("/tsum/:user/reports", get(reports))
+	router.POST("/tsum/:user/reports/searches", post(searches))
+	router.POST("/tsum/:user/reports/invites", post(invites))
 
 	err = http.ListenAndServe(":8080", router)
 	if err != nil {

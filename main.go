@@ -16,7 +16,7 @@ var parser = flags.NewParser(&common, flags.Default)
 type Common struct {
 	User            string `short:"u" long:"user" description:"User name" required:"yes"`
 	Device          string `short:"d" long:"device" description:"Device name" required:"yes"`
-	ReportingServer string `short:"r" long:"reportingServer" description:"URL of the reporting server" default:"http://localhost:8080/"`
+	ReportingServer string `short:"r" long:"reportingServer" description:"URL of the reporting server" default:"http://itwill.be/tsum"`
 }
 
 var common Common

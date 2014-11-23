@@ -12,7 +12,7 @@ import (
 )
 
 type AddCommand struct {
-	SourceInput string `short:"s" long:"source" default:"[UseReportingServer]" description:"source of user IDs to be added to contact list. Tries to parse as a URL; if this fails, will assume it is a file."`
+	SourceInput string `short:"s" long:"source" default:"" description:"source of user IDs to be added to contact list. Tries to parse as a URL; if this fails, will assume it is a file."`
 	Limit       int    `short:"l" long:"limit" default:"500" description:"how many contacts to add before stopping (defaults to 500; anything more than 800 will probably result in a tempban)"`
 }
 
@@ -21,6 +21,9 @@ var addCommand AddCommand
 func (x *AddCommand) Execute(args []string) error {
 	session := MustNewSession(common.User, common.Device, common.ReportingServer)
 
+	if x.SourceInput == "" {
+		x.SourceInput = session.reportingServer.String()
+	}
 	err := session.LoadStrangers(x.SourceInput)
 	if err != nil {
 		log.Fatalf("Could not load strangers: %v", err)
@@ -64,24 +67,17 @@ func (s *Session) AddContact(id string) (mid string, err error) {
 			r, err = AddContactFunc(s.client, <-s.reqSeq, id)
 		}
 		if err != nil {
-			errType := reflect.TypeOf(err)
-			// if it's a connection issue, bump it up the stack
-			if errType.String() == "*thrift.tTransportException" {
+			if isTransportError(err) {
 				return mid, err
 			}
-			// if it's an error from the line server, it's a
-			// possible stop condition
-			if errType.String() == "*line.TalkException" {
-				switch err.(*line.TalkException).GetCode() {
-				case line.ErrorCode_INVALID_STATE:
-					msg := "\nCan't continue adding contacts. Your contact list is probably full (5000 contacts). Sleeping for ten minutes, then will resume.\n"
-					s.logger.Print(msg)
-					log.Print(msg)
-					time.Sleep(10 * time.Minute)
-				case line.ErrorCode_ABUSE_BLOCK:
-					s.logger.Print("Your usage has been flagged as abuse and you can't presently add friends. This is almost certainly from trying to add too many friends. This is usually a temporary ban that lasts between 12 and 24 hours, but they last longer if you're a repeat offender.\n")
-					panic(ErrAbuse(line.ErrorCode_ABUSE_BLOCK))
-				}
+			if isContactsListFull(err) {
+				msg := "\nCan't continue adding contacts. Your contact list is probably full (5000 contacts). Sleeping for ten minutes, then will resume.\n"
+				s.logger.Print(msg)
+				return mid, err
+			}
+			if isAbuse(err) {
+				s.logger.Print("Your usage has been flagged as abuse and you can't presently add friends. This is almost certainly from trying to add too many friends. This is usually a temporary ban that lasts between 12 and 24 hours, but they last longer if you're a repeat offender.\n")
+				return mid, err
 			}
 		}
 	}
@@ -108,11 +104,6 @@ func (s *Session) AddContact(id string) (mid string, err error) {
 }
 
 func (s *Session) AddStrangers(limit int) (found int, err error) {
-	defer func() {
-		if r := recover(); r != nil && reflect.TypeOf(r).String() == "ErrAbuse" {
-			err = r.(ErrAbuse)
-		}
-	}()
 	max := limit
 	if len(s.strangers) < max {
 		max = len(s.strangers)
@@ -130,6 +121,9 @@ func (s *Session) AddStrangers(limit int) (found int, err error) {
 
 		mid, err := s.AddContact(id)
 		if err != nil {
+			if isAbuse(err) || isContactsListFull(err) {
+				return found, err
+			}
 			s.logger.Printf("error adding contact: %v\n", err)
 		}
 
@@ -156,10 +150,16 @@ func avg(found int, d time.Duration) float64 {
 	return float64(found) * (float64(time.Minute) / float64(d))
 }
 
-type ErrAbuse line.ErrorCode
+func isTransportError(err error) bool {
+	return reflect.TypeOf(err).String() == "*thrift.tTransportException"
+}
 
-func (ErrAbuse) Error() string {
-	return "Your usage has been flagged as abuse and you can't presently add friends. This is almost certainly from trying to add too many friends. This is usually a temporary ban that lasts between 12 and 24 hours, but they last longer if you're a repeat offender."
+func isContactsListFull(err error) bool {
+	return reflect.TypeOf(err).String() == "*line.TalkException" && err.(*line.TalkException).GetCode() == line.ErrorCode_INVALID_STATE
+}
+
+func isAbuse(err error) bool {
+	return reflect.TypeOf(err).String() == "*line.TalkException" && err.(*line.TalkException).GetCode() == line.ErrorCode_ABUSE_BLOCK
 }
 
 func addProgress(count, max, found int) {
