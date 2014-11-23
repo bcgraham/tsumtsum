@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"reflect"
 	"time"
 
 	"github.com/bcgraham/tsumtsum/external/line"
@@ -143,6 +144,10 @@ func MustNewSession(u, device, reportingServer string) *Session {
 
 	session, err := NewSession(u, password, device, reportingServer)
 	if err != nil {
+		if reflect.TypeOf(err).String() == "*line.TalkException" && err.(*line.TalkException).GetCode() == line.ErrorCode_INVALID_IDENTITY_CREDENTIAL {
+			fmt.Println("Invalid login credentials.")
+			os.Exit(1)
+		}
 		log.Fatalf("Could not create new session: %v", err)
 	}
 	return session
