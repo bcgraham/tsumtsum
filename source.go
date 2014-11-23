@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -47,13 +48,13 @@ func (s *Session) LoadStrangers(sourceraw string) error {
 	// Is it a URL?
 	_, err := url.ParseRequestURI(sourceraw)
 	if err == nil {
-		// must be a URL
+		fmt.Println("Parsed source as URL...")
 		strangers, err = GetIDsURL(Resource(s.reportingServer, "strangers"))
 		if err != nil {
 			return err
 		}
 	} else {
-		// must be a file
+		fmt.Println("Parsed source as file...")
 		strangers, err = GetIDsFile(sourceraw)
 		if err != nil {
 			return err

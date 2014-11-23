@@ -18,31 +18,25 @@ import (
 func post(res resource) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		dec := json.NewDecoder(r.Body.(io.Reader))
-		var report report
-		err := dec.Decode(&report)
+		var rep report
+		err := dec.Decode(&rep)
 		if err != nil {
 			log.Printf("error decoding json from request: %v\n", err)
 			http.Error(w, "Error. Sorry. Contact bcgraham@gmail.com. Error code A.", http.StatusBadRequest)
 			return
 		}
 
-		report.RemoteAddr = r.RemoteAddr
-		if report.Submitter != ps[0].Value {
-			log.Printf("SearchReport and URL disagree about identity of submitter: SR says \"%v\", URL says \"%v\".\n", report.Submitter, ps[0].Value)
+		rep.RemoteAddr = r.RemoteAddr
+		if rep.Submitter != ps[0].Value {
+			log.Printf("SearchReport and URL disagree about identity of submitter: SR says \"%v\", URL says \"%v\".\n", rep.Submitter, ps[0].Value)
 		}
-		go func() {
-			result, err := res.stmt.Exec(res.args(report))
+		go func(r report) {
+			_, err := res.stmt.Exec(res.args(r)...)
 			if err != nil {
 				log.Printf("error writing to db: %v\n", err)
 				return
 			}
-			affected, err := result.RowsAffected()
-			if err != nil {
-				log.Printf("error getting row count: %v\n", err)
-				return
-			}
-			log.Printf("affected %d rows\n", affected)
-		}()
+		}(rep)
 	}
 }
 
@@ -147,7 +141,7 @@ func getUserIDs(stmt *sql.Stmt, submitter string) (ids map[string]string, err er
 
 const strangersSQL = `SELECT id FROM validIDs WHERE id NOT IN (SELECT id FROM validIDsSubmitters WHERE submitter = ?);`
 const reportsSQL = `SELECT id FROM allIDsSubmitters WHERE submitter = ?`
-const searchSQL = `INSERT INTO reports (submitter, userid, mid, tstp, ip) VALUES (?, ?, ?, ?, ?)`
+const searchSQL = `INSERT INTO reports (submitter, userid, mid, ip) VALUES (?, ?, ?, ?)`
 const inviteSQL = `INSERT INTO invites (submitter, mid, ip) VALUES (?, ?, ?)`
 
 func mustPrepare(db *sql.DB, query string) *sql.Stmt {

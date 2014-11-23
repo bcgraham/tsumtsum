@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"reflect"
 	"time"
@@ -44,7 +45,7 @@ func NewSession(u, p, device, reportingServer string) (*Session, error) {
 	}
 	logger := log.New(f, "", log.LstdFlags)
 
-	rs.Path = u
+	rs.Path = path.Join(rs.Path, u)
 	s := &Session{
 		username:        u,
 		password:        p,

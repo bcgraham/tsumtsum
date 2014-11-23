@@ -20,7 +20,6 @@ var addCommand AddCommand
 
 func (x *AddCommand) Execute(args []string) error {
 	session := MustNewSession(common.User, common.Device, common.ReportingServer)
-
 	if x.SourceInput == "" {
 		x.SourceInput = session.reportingServer.String()
 	}
