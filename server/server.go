@@ -94,6 +94,7 @@ func main() {
 	router.GET("/tsum/:user/reports", get(reports))
 	router.POST("/tsum/:user/reports/searches", post(searches))
 	router.POST("/tsum/:user/reports/invites", post(invites))
+	fmt.Println("Listening...")
 	err = http.ListenAndServe(*port, router)
 	if err != nil {
 		fmt.Println(err)
