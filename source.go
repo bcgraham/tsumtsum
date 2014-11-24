@@ -48,7 +48,6 @@ func (s *Session) LoadStrangers(sourceraw string) error {
 	// Is it a URL?
 	_, err := url.ParseRequestURI(sourceraw)
 	if err == nil {
-		fmt.Println("Parsed source as URL...")
 		strangers, err = GetIDsURL(Resource(s.reportingServer, "strangers"))
 		if err != nil {
 			return err
