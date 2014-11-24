@@ -9,10 +9,13 @@ import (
 	"log"
 	"net/http"
 	"runtime"
+	"strings"
+
+	"github.com/bgentry/speakeasy"
 
 	"github.com/julienschmidt/httprouter"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 func post(res resource) httprouter.Handle {
@@ -58,8 +61,16 @@ func get(stmt *sql.Stmt) httprouter.Handle {
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	port := flag.String("port", ":8080", "port on which to run server")
+	dbuser := flag.String("dbuser", "", "user for db connection")
+	dbhost := flag.String("dbhost", "localhost:5432", "host and port of database server, formatted as 'host:port'")
 	flag.Parse()
-	db, err := sql.Open("sqlite3", "users.db")
+	dbpass, err := speakeasy.Ask("Enter password for database user '" + *dbuser + "':")
+	if err != nil {
+		log.Fatal(err)
+	}
+	credentials := mustParse(*dbuser, dbpass)
+	db, err := sql.Open("postgres", "postgres://"+credentials+"@"+*dbhost+"/tsum?sslmode=disable")
+	//	db, err := sql.Open("sqlite3", "users.db")
 	if err != nil {
 		log.Fatalf("Could not open db: %v", err)
 	}
@@ -83,7 +94,6 @@ func main() {
 	router.GET("/tsum/:user/reports", get(reports))
 	router.POST("/tsum/:user/reports/searches", post(searches))
 	router.POST("/tsum/:user/reports/invites", post(invites))
-
 	err = http.ListenAndServe(*port, router)
 	if err != nil {
 		fmt.Println(err)
@@ -139,15 +149,30 @@ func getUserIDs(stmt *sql.Stmt, submitter string) (ids map[string]string, err er
 	return ids, nil
 }
 
-const strangersSQL = `SELECT id FROM validIDs WHERE id NOT IN (SELECT id FROM validIDsSubmitters WHERE submitter = ?);`
-const reportsSQL = `SELECT id FROM allIDsSubmitters WHERE submitter = ?`
-const searchSQL = `INSERT INTO reports (submitter, userid, mid, ip) VALUES (?, ?, ?, ?)`
-const inviteSQL = `INSERT INTO invites (submitter, mid, ip) VALUES (?, ?, ?)`
+const strangersSQL = `SELECT id FROM validIDsCache WHERE id NOT IN (SELECT id FROM validIDsSubmittersCache WHERE submitter = $1) LIMIT 1000;`
+const reportsSQL = `SELECT id FROM allIDsSubmittersCache WHERE submitter = $1`
+const searchSQL = `INSERT INTO reports (submitter, userid, mid, ip) VALUES ($1, $2, $3, $4)`
+const inviteSQL = `INSERT INTO invites (submitter, mid, ip) VALUES ($1, $2, $3)`
 
 func mustPrepare(db *sql.DB, query string) *sql.Stmt {
 	stmt, err := db.Prepare(query)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	return stmt
+}
+
+func mustParse(user, pass string) string {
+	if user == "" {
+		log.Fatal("Username for DB access cannot be blank.")
+	}
+	if pass == "" {
+		log.Fatal("Password for DB access cannot be blank.")
+	}
+	if strings.Contains(user, ":") {
+		log.Fatal("Username cannot contain colon.")
+	}
+	repl := strings.NewReplacer("\\", "\\\\", "'", "\\'")
+	escPass := repl.Replace(pass)
+	return user + ":" + escPass
 }

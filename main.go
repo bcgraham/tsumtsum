@@ -26,7 +26,7 @@ func main() {
 	if _, err := parser.Parse(); err != nil {
 		os.Exit(1)
 	}
-	fmt.Printf("\n\nCompleted.\n")
+	fmt.Printf("\nCompleted.\n")
 }
 
 type prog struct {

@@ -20,10 +20,10 @@ func (x *PurgeCommand) Execute(args []string) error {
 	t := time.Now()
 
 	deleted, err := session.PurgeContactsExceptWhitelist(x.Whitelist)
-	fmt.Printf("\n\nElapsed time: %v. Averaged %.0f contacts per minute.\n", time.Since(t), avg(deleted, time.Since(t)))
 	if err != nil {
 		log.Fatalf("Error purging contacts: %v", err)
 	}
+	fmt.Printf("\n\nElapsed time: %v. Averaged %.0f contacts per minute.\n", time.Since(t), avg(deleted, time.Since(t)))
 	return nil
 }
 

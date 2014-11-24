@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -146,7 +147,11 @@ func isMid(id string) bool {
 }
 
 func avg(found int, d time.Duration) float64 {
-	return float64(found) * (float64(time.Minute) / float64(d))
+	x := float64(found) * (float64(time.Minute) / float64(d))
+	if math.IsNaN(x) {
+		return 0
+	}
+	return x
 }
 
 func isTransportError(err error) bool {

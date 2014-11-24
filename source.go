@@ -100,15 +100,24 @@ func GetIDsFile(file string) (IDs map[string]string, err error) {
 	if err != nil {
 		return IDs, err
 	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&IDs)
+	if err != nil {
+		f.Close()
+		f, err = os.Open(file)
+		if err != nil {
+			return make(map[string]string), err
+		}
+		scnr := bufio.NewScanner(f)
+		for scnr.Scan() {
+			IDs[scnr.Text()] = ""
+		}
 
-	scnr := bufio.NewScanner(f)
-	for scnr.Scan() {
-		IDs[scnr.Text()] = ""
+		if err := scnr.Err(); err != nil {
+			return make(map[string]string), err
+		}
 	}
-
-	if err := scnr.Err(); err != nil {
-		return make(map[string]string), err
-	}
+	f.Close()
 	return IDs, nil
 }
 
