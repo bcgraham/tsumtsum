@@ -151,8 +151,8 @@ func getUserIDs(stmt *sql.Stmt, submitter string) (ids map[string]string, err er
 	return ids, nil
 }
 
-const strangersSQL = `SELECT id FROM validIDs WHERE id NOT IN (SELECT id FROM validIDsSubmitters WHERE submitter = $1) LIMIT 5000;`
-const reportsSQL = `SELECT id FROM allIDsSubmitters WHERE submitter = $1`
+const strangersSQL = `SELECT id FROM validIDsCache WHERE id NOT IN (SELECT id FROM validIDsSubmittersCache WHERE submitter = $1) LIMIT 5000;`
+const reportsSQL = `SELECT id FROM allIDsSubmittersCache WHERE submitter = $1`
 const searchSQL = `INSERT INTO reports (submitter, userid, mid, ip) VALUES ($1, $2, $3, $4)`
 const inviteSQL = `INSERT INTO invites (submitter, mid, ip) VALUES ($1, $2, $3)`
 
