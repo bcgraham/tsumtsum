@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"os"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -20,6 +21,10 @@ type AddCommand struct {
 var addCommand AddCommand
 
 func (x *AddCommand) Execute(args []string) error {
+	if common.User == "LINELOGIN" {
+		fmt.Print("You have to type your own LINE login after the \"-u=\" - see how you passed \r\nin LINELOGIN? That's just placeholder text for your username.\n")
+		os.Exit(1)
+	}
 	session := MustNewSession(common.User, common.Device, common.ReportingServer)
 	if x.SourceInput == "" {
 		x.SourceInput = session.reportingServer.String()
