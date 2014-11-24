@@ -8,9 +8,10 @@ Install:
 ```
 go get github.com/bcgraham/tsumtsum
 ```
-Or download: 
-    <a href="http://itwill.be/compiled/tsumtsum">Mac OS X</a> (SHA: 21c041196d27544c155dfeb1e7e1997f116a202b) 
-    <a href="http://itwill.be/compiled/tsumtsum.exe">Windows</a> (SHA: 02c6b888687091ff0e59f1798845db28ef2068ab)
+Or download:
+
+* <a href="http://itwill.be/compiled/tsumtsum">Mac OS X</a> (SHA: 21c041196d27544c155dfeb1e7e1997f116a202b) 
+* <a href="http://itwill.be/compiled/tsumtsum.exe">Windows</a> (SHA: 02c6b888687091ff0e59f1798845db28ef2068ab)
 
 First-time user? Want to get going now? This is probably what you want to do. Replace LINELOGIN with your LINE login name. 
 ```
