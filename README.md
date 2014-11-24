@@ -65,3 +65,11 @@ $ tsumtsum -u=LINELOGIN purge -w=whitelist.json
 This deletes all your contacts except those you've saved on the whitelist. It's really fast. 
 
 If you have any questions, feel free to shoot me an email at bcgraham@gmail.com . 
+
+###Thanks
+
+Thanks to Matti Virkkunen, whose <a href="http://altrepo.eu/git/line-protocol.git/">documentation of the LINE API</a> is truly stellar and who helped me when I was stuck. 
+
+###License
+
+MIT license for my parts - doesn't apply to /external/. This is in NO WAY affiliated with Naver Corporation or LINE.
