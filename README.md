@@ -14,10 +14,23 @@ Or download:
 * <a href="http://itwill.be/compiled/tsumtsum.exe">Windows</a> (SHA: 02c6b888687091ff0e59f1798845db28ef2068ab)
 
 First-time user? Want to get going now? This is probably what you want to do. Replace LINELOGIN with your LINE login name. 
+
+#####OS X:  
 ```
-$ tsumtsum -u=LINELOGIN whitelist -o=whitelist.json
-$ tsumtsum -u=LINELOGIN add 
+$ cd $HOME/Downloads
+$ chmod +x ./tsumtsum
+$ ./tsumtsum -u=LINELOGIN whitelist -o=whitelist.json
+$ ./tsumtsum -u=LINELOGIN add 
 ```
+
+#####Windows:
+Open a new terminal window and type:  
+```
+$ cd Downloads
+$ tsumtsum.exe -u=LINELOGIN whitelist -o=whitelist.json
+$ tsumtsum.exe -u=LINELOGIN add 
+```
+
 ###Features
 This is a command-line tool for adding adding and removing contacts from your LINE contact list. Its main features are:
 * It works on **Windows, OS X, and Linux**. 
