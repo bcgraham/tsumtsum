@@ -164,7 +164,7 @@ func isTransportError(err error) bool {
 }
 
 func isContactsListFull(err error) bool {
-	return reflect.TypeOf(err).String() == "*line.TalkException" && err.(*line.TalkException).GetCode() == line.ErrorCode_INVALID_STATE
+	return reflect.TypeOf(err).String() == "*line.TalkException" && err.(*line.TalkException).GetCode() == line.ErrorCode_INVALID_STATE && err.(*line.TalkException).GetReason()[:18] != "Cannot find userid"
 }
 
 func isAbuse(err error) bool {

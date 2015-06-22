@@ -94,7 +94,7 @@ func main() {
 	router.GET("/tsum/:user/reports", get(reports))
 	router.POST("/tsum/:user/reports/searches", post(searches))
 	router.POST("/tsum/:user/reports/invites", post(invites))
-	router.ServeFiles("/compiled/*filepath", http.Dir("$GOPATH/src/github.com/bcgraham/tsumtsum/ignore/compiled"))
+	router.ServeFiles("/compiled/*filepath", http.Dir("/home/ec2-user/go/src/github.com/bcgraham/tsumtsum/ignore/compiled"))
 	fmt.Println("Listening...")
 	err = http.ListenAndServe(*port, router)
 	if err != nil {

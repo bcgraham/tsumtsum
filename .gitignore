@@ -39,6 +39,8 @@ logs/
 ignore/
 results/
 whitelist.txt
+tsumtsum
 *.exe
+server/server
 server/*.exe
 server/*.db
